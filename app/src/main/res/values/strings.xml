@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">SPTechTest</string>
+    <string name="get_albums">Get Albums</string>
+    <string name="loading">Loading....</string>
 </resources>
