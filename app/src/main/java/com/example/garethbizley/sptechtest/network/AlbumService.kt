@@ -1,5 +1,6 @@
 package com.example.garethbizley.sptechtest.network
 
+import com.example.garethbizley.sptechtest.model.Album
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -10,9 +11,8 @@ import retrofit2.http.GET
  */
 interface AlbumService {
 
-    //TODO replace string with Serialized album object
     @GET("albums")
-    fun getAlbums() : Call<List<String>>
+    fun getAlbums() : Call<List<Album>>
 
     companion object {
         fun create(): AlbumService {
@@ -25,5 +25,4 @@ interface AlbumService {
             return retrofit.create(AlbumService::class.java)
         }
     }
-
 }
