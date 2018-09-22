@@ -18,3 +18,12 @@ It should display a list of titles returned by “`/albums`” call (one below a
 *Premium requirements:*
 * There should be at least one automated instrumentation test using *Espresso*.
 * The albums in the list should be sorted by title. (edited)
+
+
+***RECOMMENDED IMPROVEMENTS***
+
+- Allow user to sort list by UserId or Id rather than just title
+- Improve the UI with some pretty designs 
+- I suspect my implementation of using the MainActivity as the IAlbumRequestListener could lead to possible memory leaks down the line
+- Persist the list of albums to the device
+- If we had control over the api allow requests for pages of results rather than all at once to ease network stress
