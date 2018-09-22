@@ -7,7 +7,7 @@ import com.example.garethbizley.sptechtest.model.Album
  */
 interface IAlbumRequestListener {
 
-    fun onSuccessfulRequest(albumList: List<Album>)
+    fun onSuccessfulRequest(returnedAlbumList: List<Album>)
 
     fun onFailedRequest(errorMessage: String)
 }
