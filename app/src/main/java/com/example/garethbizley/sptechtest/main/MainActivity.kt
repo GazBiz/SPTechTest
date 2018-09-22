@@ -1,7 +1,8 @@
-package com.example.garethbizley.sptechtest
+package com.example.garethbizley.sptechtest.main
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import com.example.garethbizley.sptechtest.R
 
 class MainActivity : AppCompatActivity() {
 
