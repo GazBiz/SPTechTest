@@ -10,11 +10,13 @@ import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.Toast
+import android.arch.lifecycle.ViewModelProviders
 import com.example.garethbizley.sptechtest.R
 import com.example.garethbizley.sptechtest.adapter.AlbumsRvAdapter
 import com.example.garethbizley.sptechtest.contract.IAlbumRequestListener
 import com.example.garethbizley.sptechtest.model.Album
 import com.example.garethbizley.sptechtest.repository.AlbumRepository
+import com.example.garethbizley.sptechtest.viewmodel.AlbumViewModel
 
 class MainActivity : AppCompatActivity(), IAlbumRequestListener {
 
@@ -24,7 +26,7 @@ class MainActivity : AppCompatActivity(), IAlbumRequestListener {
     private lateinit var loadingDisplay: View
     private lateinit var getAlbumsButton: Button
     private lateinit var albumsRecyclerView: RecyclerView
-    private val albumsList = ArrayList<Album>()
+    private lateinit var viewModel: AlbumViewModel
     //endregion
 
     //region Overridden Activity Functions
@@ -32,15 +34,24 @@ class MainActivity : AppCompatActivity(), IAlbumRequestListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        viewModel = ViewModelProviders.of(this).get(AlbumViewModel::class.java)
+
         getAlbumsButton = findViewById(R.id.get_albums_btn)
         loadingDisplay = findViewById(R.id.loading_display_ll)
         albumsRecyclerView = findViewById(R.id.albums_display_rv)
 
         albumsRecyclerView.layoutManager = LinearLayoutManager(this)
-        albumsRecyclerView.adapter = AlbumsRvAdapter(albumsList, this)
+        albumsRecyclerView.adapter = AlbumsRvAdapter(viewModel.albumsList, this)
         val dividerDecoration = DividerItemDecoration(albumsRecyclerView.context,
                 LinearLayout.VERTICAL)
         albumsRecyclerView.addItemDecoration(dividerDecoration)
+
+        if(viewModel.albumsList.isEmpty()){
+            getAlbumsButton.visibility = View.VISIBLE
+        }
+        else {
+            getAlbumsButton.visibility = View.GONE
+        }
 
         getAlbumsButton.setOnClickListener {
             albumRepository.getAlbums()
@@ -53,7 +64,8 @@ class MainActivity : AppCompatActivity(), IAlbumRequestListener {
     //region Overridden IAlbumRequestListener Functions
     override fun onSuccessfulRequest(returnedAlbumList: List<Album>) {
         loadingDisplay.visibility = View.GONE
-        albumsList.addAll(returnedAlbumList)
+        viewModel.albumsList.addAll(returnedAlbumList)
+        viewModel.sortAlbumsByTitle()
         albumsRecyclerView.adapter?.notifyDataSetChanged()
     }
 

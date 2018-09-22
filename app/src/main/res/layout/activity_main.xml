@@ -21,7 +21,9 @@
         android:textColor="@color/almost_black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"/>
+        app:layout_constraintRight_toRightOf="parent"
+        android:visibility="gone"
+        tools:visibility="visible"/>
 
     <LinearLayout
         android:id="@+id/loading_display_ll"
