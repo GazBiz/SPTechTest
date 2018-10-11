@@ -12,13 +12,13 @@ import javax.inject.Inject
 
 class AlbumViewModel @Inject constructor(): ViewModel() {
 
-    //todo ideally we don't want a second list here, just use livedata one hmmmm
+    //todo ideally we don't want a second list here, just use livedata one
     val albumsList = ArrayList<Album>()
 
-    //ideally we should inject this should be easier without the lsitener callback to fucka bout with
+    //todo inject this
     private val albumRepository = AlbumRepository()
 
-    //Ideally would move to BG thread for sorting operation
+    //todo move to BG thread for sorting operation
     fun sortAlbumsByTitle(){
         val sortedArrayList = ArrayList(albumRepository.liveAlbums.value?.sortedWith(compareBy({ it.title })))
         albumsList.clear()
