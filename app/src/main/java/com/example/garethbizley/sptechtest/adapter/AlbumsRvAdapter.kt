@@ -13,7 +13,7 @@ import kotlinx.android.synthetic.main.album_display_cell.view.*
 /**
  * Created by Gaz Biz on 22/9/18.
  */
-class AlbumsRvAdapter(private val albumsList: ArrayList<Album>, private val context: Context) : RecyclerView.Adapter<AlbumViewHolder>(){
+class AlbumsRvAdapter(private val albumsList: List<Album>, private val context: Context) : RecyclerView.Adapter<AlbumViewHolder>(){
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AlbumViewHolder {
         return AlbumViewHolder(LayoutInflater.from(context).inflate(R.layout.album_display_cell, parent, false))
     }
