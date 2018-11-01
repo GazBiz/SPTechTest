@@ -21,7 +21,7 @@ class AlbumRepository(application: Application): IAlbumRepository {
     @Inject
     lateinit var albumService: AlbumService
 
-    lateinit var callbackListener: IRepositoryCallback
+    private lateinit var callbackListener: IRepositoryCallback
 
     init {
         (application as AlbumsApplication).appComponent.inject(this)
