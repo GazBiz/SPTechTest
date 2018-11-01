@@ -4,13 +4,12 @@ package com.example.garethbizley.sptechtest.viewmodel
 import com.example.garethbizley.sptechtest.model.Album
 import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
-import android.arch.lifecycle.LiveData
 import com.example.garethbizley.sptechtest.AlbumsApplication
 import com.example.garethbizley.sptechtest.contract.IRepositoryCallback
 import com.example.garethbizley.sptechtest.contract.IViewModelCallback
 import com.example.garethbizley.sptechtest.repository.IAlbumRepository
+import com.example.garethbizley.sptechtest.util.Utils
 import javax.inject.Inject
-
 
 /**
  * Created by Gaz Biz on 22/9/18.
@@ -19,7 +18,7 @@ import javax.inject.Inject
 class AlbumViewModel @Inject constructor(application: Application): AndroidViewModel(application), IAlbumViewModel, IRepositoryCallback {
 
     override val albumsList = ArrayList<Album>()
-    lateinit var callback: IViewModelCallback
+    private lateinit var callback: IViewModelCallback
 
     @Inject
     lateinit var albumRepository: IAlbumRepository
@@ -27,13 +26,6 @@ class AlbumViewModel @Inject constructor(application: Application): AndroidViewM
     init {
         (application as AlbumsApplication).appComponent.inject(this)
         albumRepository.setRepoCallbackListener(this)
-    }
-
-    //todo move to BG thread for sorting operation
-    private fun sortAlbumsListByTitle(){
-        val sortedArrayList = ArrayList(albumsList.sortedWith(compareBy({ it.title })))
-        albumsList.clear()
-        albumsList.addAll(sortedArrayList)
     }
 
     //region IAlbumViewModel functions
@@ -57,9 +49,9 @@ class AlbumViewModel @Inject constructor(application: Application): AndroidViewM
     }
     //endregion
 
-    private fun updateAlbumList(albumsList: List<Album>){
-        this.albumsList.clear()
-        this.albumsList.addAll(albumsList)
-        sortAlbumsListByTitle()
+    private fun updateAlbumList(returnedList: List<Album>){
+        albumsList.clear()
+        albumsList.addAll(returnedList)
+        Utils.sortAlbumsListByTitle(albumsList)
     }
 }

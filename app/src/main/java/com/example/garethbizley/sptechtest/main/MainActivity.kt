@@ -62,6 +62,9 @@ class MainActivity : AppCompatActivity(), IViewModelCallback {
     override fun onAlbumsReturned() {
         loading_display_ll.visibility = View.GONE
         albums_display_rv.adapter?.notifyDataSetChanged()
+
+        if(albums_display_rv.adapter?.itemCount == 0)
+            onErrorReturned("No Albums were returned")
     }
 
     override fun onErrorReturned(message: String) {
