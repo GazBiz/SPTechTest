@@ -1,35 +1,57 @@
 package com.example.garethbizley.sptechtest.viewmodel
 
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.ViewModel
+
 import com.example.garethbizley.sptechtest.model.Album
-import com.example.garethbizley.sptechtest.repository.AlbumRepository
+import android.app.Application
+import android.arch.lifecycle.AndroidViewModel
+import com.example.garethbizley.sptechtest.AlbumsApplication
+import com.example.garethbizley.sptechtest.contract.IRepositoryCallback
+import com.example.garethbizley.sptechtest.contract.IViewModelCallback
+import com.example.garethbizley.sptechtest.repository.IAlbumRepository
+import com.example.garethbizley.sptechtest.util.Utils
 import javax.inject.Inject
 
 /**
  * Created by Gaz Biz on 22/9/18.
  */
 
-class AlbumViewModel @Inject constructor(): ViewModel() {
+class AlbumViewModel @Inject constructor(application: Application): AndroidViewModel(application), IAlbumViewModel, IRepositoryCallback {
 
-    //todo ideally we don't want a second list here, just use livedata one
-    val albumsList = ArrayList<Album>()
+    override val albumsList = ArrayList<Album>()
+    private lateinit var callback: IViewModelCallback
 
-    //todo inject this
-    private val albumRepository = AlbumRepository()
+    @Inject
+    lateinit var albumRepository: IAlbumRepository
 
-    //todo move to BG thread for sorting operation
-    fun sortAlbumsByTitle(){
-        val sortedArrayList = ArrayList(albumRepository.liveAlbums.value?.sortedWith(compareBy({ it.title })))
+    init {
+        (application as AlbumsApplication).appComponent.inject(this)
+        albumRepository.setRepoCallbackListener(this)
+    }
+
+    //region IAlbumViewModel functions
+    override fun requestAlbums() {
+         albumRepository.getAlbumsFromApi()
+    }
+
+    override fun setCallbackListener(callbackListener: IViewModelCallback) {
+        callback = callbackListener
+    }
+    //endregion
+
+    //region IRepositoryCallback functions
+    override fun onAlbumsReturned(albumList: List<Album>) {
+        updateAlbumList(albumList)
+        callback.onAlbumsReturned()
+    }
+
+    override fun onErrorReturned(message: String) {
+        callback.onErrorReturned(message)
+    }
+    //endregion
+
+    private fun updateAlbumList(returnedList: List<Album>){
         albumsList.clear()
-        albumsList.addAll(sortedArrayList)
-    }
-
-    fun requestAlbums() {
-         albumRepository.getAlbums()
-    }
-
-    fun getAlbumObservable(): LiveData<List<Album>>{
-        return albumRepository.liveAlbums
+        albumsList.addAll(returnedList)
+        Utils.sortAlbumsListByTitle(albumsList)
     }
 }
