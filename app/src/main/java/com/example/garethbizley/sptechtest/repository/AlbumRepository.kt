@@ -2,7 +2,6 @@ package com.example.garethbizley.sptechtest.repository
 
 
 import android.app.Application
-import android.arch.lifecycle.MutableLiveData
 import com.example.garethbizley.sptechtest.AlbumsApplication
 import com.example.garethbizley.sptechtest.contract.IRepositoryCallback
 import com.example.garethbizley.sptechtest.model.Album
@@ -16,7 +15,11 @@ import javax.inject.Inject
 /**
  * Created by Gaz Biz on 22/9/18.
  */
+const val RETRIES = 3
+
 class AlbumRepository(application: Application): IAlbumRepository {
+
+    var networkAttempts = 0
 
     @Inject
     lateinit var albumService: AlbumService
@@ -37,7 +40,19 @@ class AlbumRepository(application: Application): IAlbumRepository {
             }
 
             override fun onResponse(call: Call<List<Album>>?, response: Response<List<Album>>?) {
-                callbackListener.onAlbumsReturned(response?.body() ?: emptyList())
+
+                //Happy path, albums returned ok then update listener and return
+                if(response != null && response.isSuccessful) {
+                    callbackListener.onAlbumsReturned(response.body() ?: emptyList())
+                    return
+                }
+
+                //If some issue, retry 3 times then fire an error
+                if(++networkAttempts <= RETRIES) {
+                    getAlbumsFromApi()
+                }
+                else
+                    callbackListener.onErrorReturned("Network Timeout :(")
             }
         })
     }
