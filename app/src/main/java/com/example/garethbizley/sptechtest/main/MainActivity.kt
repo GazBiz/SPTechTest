@@ -13,14 +13,12 @@ import android.arch.lifecycle.ViewModelProviders
 import com.example.garethbizley.sptechtest.AlbumsApplication
 import com.example.garethbizley.sptechtest.R
 import com.example.garethbizley.sptechtest.adapter.AlbumsRvAdapter
-import com.example.garethbizley.sptechtest.contract.IViewModelCallback
 import com.example.garethbizley.sptechtest.viewmodel.AlbumViewModel
 import com.example.garethbizley.sptechtest.viewmodel.IAlbumViewModel
 import javax.inject.Inject
 import kotlinx.android.synthetic.main.activity_main.*
 
-
-class MainActivity : AppCompatActivity(), IViewModelCallback {
+class MainActivity : AppCompatActivity() {
 
     //region Instantiate Class Variables
     private val TAG = MainActivity::class.java.name
@@ -36,17 +34,20 @@ class MainActivity : AppCompatActivity(), IViewModelCallback {
         (application as AlbumsApplication).appComponent.inject(this)
 
         viewModel = ViewModelProviders.of(this).get(AlbumViewModel::class.java)
-        viewModel.setCallbackListener(this)
 
+        setupRecyclerView()
         //show getAlbum button or not depending on if list is populated
         get_albums_btn.visibility = if (viewModel.albumsList.isEmpty()) View.VISIBLE else View.GONE
 
         get_albums_btn.setOnClickListener {
             viewModel.requestAlbums()
+                    .doOnSuccess { onAlbumsReturned() }
+                    .doOnError { showError(it.localizedMessage) }
+                    .subscribe()
+
             get_albums_btn.visibility = View.GONE
             loading_display_ll.visibility = View.VISIBLE
         }
-        setupRecyclerView()
     }
     //endregion
 
@@ -58,16 +59,16 @@ class MainActivity : AppCompatActivity(), IViewModelCallback {
         albums_display_rv.addItemDecoration(dividerDecoration)
     }
 
-    //region IViewModelCallback functions
-    override fun onAlbumsReturned() {
+    private fun onAlbumsReturned() {
         loading_display_ll.visibility = View.GONE
+        albums_display_rv.visibility = View.VISIBLE
         albums_display_rv.adapter?.notifyDataSetChanged()
 
         if(albums_display_rv.adapter?.itemCount == 0)
-            onErrorReturned("No Albums were returned")
+            showError("No Albums were returned")
     }
 
-    override fun onErrorReturned(message: String) {
+    private fun showError(message: String) {
         //log error for debugging
         Log.e(TAG, "Error getting albums: $message")
         //inform user of error
@@ -76,5 +77,4 @@ class MainActivity : AppCompatActivity(), IViewModelCallback {
         get_albums_btn.visibility = View.VISIBLE
         loading_display_ll.visibility = View.GONE
     }
-    //endregion
 }
