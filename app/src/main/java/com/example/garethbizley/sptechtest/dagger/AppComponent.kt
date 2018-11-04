@@ -10,7 +10,7 @@ import javax.inject.Singleton
  * Created by Gaz Biz on 31/10/18.
  */
 @Singleton
-@Component(modules = [AppModule::class, MainActivityModule::class, AlbumViewModelModule::class, AlbumRepositoryModule::class])
+@Component(modules = [AppModule::class])
 interface AppComponent {
 
     fun inject(target: MainActivity)
